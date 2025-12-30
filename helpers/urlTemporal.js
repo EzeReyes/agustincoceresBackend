@@ -17,7 +17,7 @@ export function generarURLTemporal(videoId, userId, expiresIn = 600) {
     { expiresIn }
   );
 
-  return `http://localhost:4001/ver/${videoId}?token=${token}`;
+  return `${process.env.VITE.API.URL}/ver/${videoId}?token=${token}`;
 }
 
 /**
