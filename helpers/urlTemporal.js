@@ -32,6 +32,7 @@ export function validarToken(token) {
     console.log("User ID del token validado:", payload.userId);
     return payload;
   } catch (err) {
-    return null; // Token inválido o expirado
+    console.error("Error al validar el token:", err.message);
+    return null; // Token inválido o expirado 
   }
 }
