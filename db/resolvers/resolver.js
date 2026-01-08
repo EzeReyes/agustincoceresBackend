@@ -283,15 +283,13 @@ const resolvers = {
 
             const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '20m' });
             
-            res.setHeader('Set-Cookie', cookie.serialize('authToken', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            // secure: true,
-            maxAge: 1800,
-            sameSite: 'Lax',
-            // sameSite: 'none',
-            path: '/'
-        }));
+  res.setHeader('Set-Cookie', cookie.serialize('authToken', token, {
+  httpOnly: true, // mantenelo activado para seguridad
+  secure: process.env.NODE_ENV === 'production', // true solo en prod con HTTPS
+  maxAge: 1800,
+  sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
+  path: '/'
+}));
 
         return {
         mensaje: 'Sesión iniciada',
