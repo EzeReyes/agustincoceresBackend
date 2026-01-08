@@ -53,28 +53,68 @@ app.get('/api/url-temporal/:videoId', (req, res) => {
 });
 
 // Endpoint para validar y redirigir
-app.get('/ver/:videoId', async (req, res) => {
+// app.get('/ver/:videoId', async (req, res) => {
+//   const { token } = req.query;
+//   // console.log("Token recibido en /ver/:videoId :", token);
+//   const payload = validarToken(token);
+
+//   console.log("Payload recibido en /ver/:videoId :", payload);
+
+//   if (!payload) {
+//     return res.status(403).send('Token inválido o expirado');
+//   }
+
+//   const existeMembresia = await MembresiaCliente.findOne({
+//     cliente: payload.userId,
+//   });
+
+//   if (!existeMembresia) {
+//     return res.status(403).send('No tiene suscripción al curso');
+//   }
+
+//   // res.redirect(`https://www.youtube.com/watch?v=${payload.videoId}`);
+//   res.redirect(`${process.env.FRONTEND_URL}/curso/${payload.videoId}`);
+// });
+
+app.get('/ver', async (req, res) => {
   const { token } = req.query;
-  // console.log("Token recibido en /ver/:videoId :", token);
-  const payload = validarToken(token);
 
-  console.log("Payload recibido en /ver/:videoId :", payload);
-
-  if (!payload) {
-    return res.status(403).send('Token inválido o expirado');
+  let payload;
+  try {
+    payload = validarToken(token);
+  } catch {
+    return res.status(403).send('Token inválido');
   }
 
-  const existeMembresia = await MembresiaCliente.findOne({
+  const membresia = await MembresiaCliente.findOne({
     cliente: payload.userId,
   });
 
-  if (!existeMembresia) {
-    return res.status(403).send('No tiene suscripción al curso');
+  if (!membresia) {
+    return res.status(403).send('Sin suscripción');
   }
 
-  // res.redirect(`https://www.youtube.com/watch?v=${payload.videoId}`);
-  res.redirect(`${process.env.FRONTEND_URL}/curso/${payload.videoId}`);
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Curso</title>
+        <style>
+          body { margin:0; background:black; }
+          iframe { width:100vw; height:100vh; border:none; }
+        </style>
+      </head>
+      <body>
+        <iframe 
+          src="https://player.vimeo.com/video/${payload.videoId}"
+          allow="autoplay; fullscreen"
+          allowfullscreen
+        ></iframe>
+      </body>
+    </html>
+  `);
 });
+
 
 // VIMEO SETUP EXAMPLE
 // const vimeoClient = new Vimeo(

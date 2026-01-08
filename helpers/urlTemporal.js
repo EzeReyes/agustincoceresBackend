@@ -17,7 +17,7 @@ export function generarURLTemporal(videoId, userId, expiresIn = 600) {
     { expiresIn }
   );
 
-  return `${process.env.BACKEND_URL}/ver/${videoId}?token=${token}`;
+  return `${process.env.BACKEND_URL}/ver?token=${token}`;
 }
 
 /**
