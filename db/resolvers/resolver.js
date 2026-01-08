@@ -285,9 +285,9 @@ const resolvers = {
             
   res.setHeader('Set-Cookie', cookie.serialize('authToken', token, {
   httpOnly: true, // mantenelo activado para seguridad
-  secure: process.env.NODE_ENV === 'production', // true solo en prod con HTTPS
+  secure: true, // true solo en prod con HTTPS
   maxAge: 1800,
-  sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
+  sameSite: 'none',
   path: '/'
 }));
 
