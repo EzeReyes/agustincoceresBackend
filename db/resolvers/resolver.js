@@ -284,14 +284,13 @@ const resolvers = {
             const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '20m' });
             
             res.setHeader('Set-Cookie', cookie.serialize('authToken', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            // secure: true,
-            maxAge: 1800,
-            sameSite: 'lax',
-            // sameSite: 'none',
-            path: '/'
-        }));
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // true solo en prod
+                maxAge: 1800,
+                sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
+                path: '/'
+                }));
+
 
         return {
         mensaje: 'Sesión iniciada',
@@ -299,19 +298,14 @@ const resolvers = {
         };
         },
         logout: (_, __, { res }) => {
-        res.setHeader('Set-Cookie', cookie.serialize('authToken', '', {
-              httpOnly: true,
-                secure: true,         // requiere HTTPS
-                maxAge: 1800,
-                sameSite: 'lax',      // si frontend y backend están en el mismo dominio
-                path: '/'
-                // sino
-                // httpOnly: true,
-                // secure: false,        // en local, sin HTTPS
-                // maxAge: 1800,
-                // sameSite: 'none',     // permite cross-site
-                // path: '/'
+        res.setHeader('Set-Cookie', cookie.serialize('authToken', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // true solo en prod
+        maxAge: 1800,
+        sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
+        path: '/'
         }));
+
 
         return 'Sesión cerrada';
         },
