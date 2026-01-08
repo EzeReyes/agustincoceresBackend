@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const CursoSchema = mongoose.Schema({
     nombre: {
@@ -11,10 +11,10 @@ const CursoSchema = mongoose.Schema({
         required: true,
         trim: true
     },
-    url: {
-        type: String,
+    idVideo: {
+        type: Schema.Types.ObjectId,
+        ref: 'Video',
         required: true,
-        trim: true
     },
     img: {
         type: String,

@@ -2,6 +2,7 @@ import Cliente from '../../models/Cliente.js';
 import Membresia from '../../models/Membresia.js';
 import Pago from '../../models/Pago.js';
 import Curso from '../../models/Curso.js';
+import Video from '../../models/Video.js';
 import Producto from '../../models/Producto.js';
 import MembresiaCliente from '../../models/MembresiaCliente.js';
 import bcrypt from 'bcryptjs';
@@ -56,9 +57,34 @@ const resolvers = {
             const cliente = await Cliente.findById(id);
             return cliente;
         },
-        obtenerMembresiaCliente: async (_, { clienteId }) => {
-            const membresiaCliente = await MembresiaCliente.findOne({ cliente: clienteId }).populate('membresia').populate('pago');
-            return membresiaCliente;
+       obtenerMembresiaCliente: async (_, { cliente }) => {
+        try {
+        console.log("🔥 resolver ejecutado");
+        console.log("cliente:", cliente);
+
+        const membresia = await MembresiaCliente.findOne({
+            cliente: cliente
+        }).populate('cliente').populate({
+            path: 'membresia',
+            populate: {
+                path: 'cursos', 
+                populate: {
+                path: 'idVideo'
+                }
+            }
+            }).populate('pago');
+
+        console.log("resultado:", membresia);
+
+        return membresia;
+    } catch (error) {
+        console.error("Error en obtenerMembresiaCliente:", error);
+        throw new Error('Error al obtener la membresía del cliente');
+    }
+        },
+        obtenerMembresiasCliente: async () => {
+            const membresiasCliente = await MembresiaCliente.find().populate('cliente').populate('membresia').populate('pago');
+            return membresiasCliente;
         },
         obtenerPagosCliente: async (_, { clienteId }) => {
             const pagos = await Pago.find({ cliente: clienteId });
@@ -77,10 +103,6 @@ const resolvers = {
             const curso = await Curso.findById(id);
             return curso;
         },
-        obtenerMembresiaClientePorId: async (_, { id }) => {
-            const membresiaCliente = await MembresiaCliente.findById(id).populate('cliente').populate('membresia').populate('pago');
-            return membresiaCliente;
-        },
         obtenerPago: async (_, {id}) => {
             const pago = await Pago.findById(id);
             return pago;
@@ -88,6 +110,27 @@ const resolvers = {
         obtenerProductos: async () => {
             const productos = await Producto.find();
             return productos;
+        },
+        obtenerCurso: async (_, { id }) => {
+            const curso = await Curso.findById(id);
+            return curso;
+        },
+        obtenerCursos: async () => {
+            const cursos = await Curso.find();
+            return cursos;
+        },
+        obtenerVideos: async () => {
+            const videos = await Video.find();
+            return videos;
+        },
+        obtenerVideo: async (_, {idVideo}) => {
+            const video = await Video.findOne({idVideo});
+            console.log(video);
+            return video;
+        },
+        obtenerMembresiaClienteID: async(_, {id}) => {
+            const membresiaCliente = await MembresiaCliente.findById(id).populate('cliente').populate('membresia').populate('pago');
+            return membresiaCliente;
         }
     },
     Mutation: {
@@ -164,7 +207,7 @@ const resolvers = {
                 console.log(error);
             }
         },
-        crearMembresia: async (_, { tipo, precio }) => {
+        crearMembresia: async (_, { nombre, precio }) => {
             try {
                 if (!tipo || !precio) {
                     throw new Error('Todos los campos son obligatorios');
@@ -242,11 +285,11 @@ const resolvers = {
             
             res.setHeader('Set-Cookie', cookie.serialize('authToken', token, {
             httpOnly: true,
-            // secure: process.env.NODE_ENV === 'production',
-            secure: true,
+            secure: process.env.NODE_ENV === 'production',
+            // secure: true,
             maxAge: 1800,
-            // sameSite: 'lax',
-            sameSite: 'none',
+            sameSite: 'lax',
+            // sameSite: 'none',
             path: '/'
         }));
 
@@ -258,11 +301,11 @@ const resolvers = {
         logout: (_, __, { res }) => {
         res.setHeader('Set-Cookie', cookie.serialize('authToken', '', {
             httpOnly: true,
-            // secure: process.env.NODE_ENV === 'production',
-            secure: true,
+            secure: process.env.NODE_ENV === 'production',
+            // secure: true,
             maxAge: 0,
-            // sameSite: 'lax',
-            sameSite: 'none',
+            sameSite: 'lax',
+            // sameSite: 'none',
             path: '/'
         }));
 
@@ -312,6 +355,43 @@ const resolvers = {
             await cliente.save();
 
             return { success: true, message: 'Password modificado serás redirigido a login' };
+        },
+        crearCurso: async (_, { nombre, descripcion, idVideo }) => {
+            try {
+                if (!nombre || !descripcion || !idVideo) {
+                    throw new Error('Todos los campos son obligatorios');
+                }
+            const datos = await new Curso({ nombre, descripcion, idVideo });
+            datos.save(); 
+            return datos;
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        crearVideo: async (_, { titulo, descripcion, duracion, url }) => {
+            try {
+                if (!titulo || !descripcion || !duracion || !url) {
+                    throw new Error('Todos los campos son obligatorios');
+                }
+            const datos = await new Video({ titulo, descripcion, duracion, url });
+            datos.save(); 
+            return datos;
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        agregarCursoAMembresia: async (_, { membresiaId, cursoId }) => {
+            try {
+                const membresia = await Membresia.findById(membresiaId);
+                if (!membresia) {
+                    throw new Error('Membresia no encontrada');
+                }
+                membresia.cursos.push(cursoId);
+                await membresia.save();
+                return membresia;
+            } catch (error) {
+                console.log(error);
+            }
         },
     }
 };

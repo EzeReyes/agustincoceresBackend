@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 
 const MembresiaSchema = mongoose.Schema({
-    tipo: {
+    nombre: {
     type: String,
-    enum: ['BASICA', 'PREMIUM'],
-    default: 'BASICA'
+    default: 'Membresia Standard'
     },
-    precio: { type: Number, required: true }
+    precio: { type: Number, required: true },
+    cursos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Curso' }]
 });
 
 const Membresia = mongoose.model('Membresia', MembresiaSchema);

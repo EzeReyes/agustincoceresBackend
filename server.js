@@ -11,6 +11,7 @@ import conectarDB from './config/db.js';
 import { expressMiddleware } from '@as-integrations/express5';
 import { generarURLTemporal, validarToken } from './helpers/urlTemporal.js';
 import MembresiaCliente from './models/MembresiaCliente.js';
+import { Vimeo } from 'vimeo';
 conectarDB();
 
 const app = express();
@@ -74,6 +75,25 @@ app.get('/ver/:videoId', async (req, res) => {
   // res.redirect(`https://www.youtube.com/watch?v=${payload.videoId}`);
   res.redirect(`${process.env.FRONTEND_URL}/curso/${payload.videoId}`);
 });
+
+// VIMEO SETUP EXAMPLE
+// const vimeoClient = new Vimeo(
+//   process.env.CLIENT_VIMEO,
+//   process.env.CLIENT_SECRET_VIMEO,
+//   process.env.TOKEN_VIMEO
+// );
+
+  
+//   vimeoClient.request({
+//     method: 'GET',
+//     path: '/tutorial'
+//   }, function (error, body, status_code, headers) {
+//     if (error) {
+//       console.log(error);
+//     }
+
+//     console.log(body);
+//   })
 
 
 

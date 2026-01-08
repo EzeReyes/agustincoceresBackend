@@ -23,8 +23,10 @@ const typeDefs = gql`
     }
 
     type Membresia {
-        tipo: String!
+        id: ID!
+        nombre: String!
         precio: String!
+        cursos: [Curso]
     }
 
     type Pago {
@@ -38,8 +40,16 @@ const typeDefs = gql`
         id: ID!
         nombre: String!
         descripcion: String!
-        url: String!
+        idVideo: Video!
         img: String
+    }
+
+    type Video {
+        id: ID!
+        titulo: String!
+        descripcion: String!
+        duracion: Float!
+        idVideo: String!
     }
 
     type Producto {
@@ -66,7 +76,7 @@ const typeDefs = gql`
     input CursoInput {
         nombre: String!
         descripcion: String!
-        url: String!
+        idVideo: ID!
     }
 
     type LoginResponse {
@@ -93,21 +103,24 @@ const typeDefs = gql`
         obtenerMembresia(tipo: String!): Membresia
         obtenerCursosCliente(clienteId: ID!): [Curso]
         obtenerCliente(id: ID!): Cliente
-        obtenerMembresiaCliente(clienteId: ID!): MembresiaCliente
+        obtenerMembresiaCliente(cliente: ID!): MembresiaCliente
         obtenerPagosCliente(clienteId: ID!): [Pago]
         obtenerCursosDisponibles: [Curso]
         obtenerCursosNoInscritos(clienteId: ID!): [Curso]
         obtenerCurso(id: ID!): Curso
-        obtenerMembresiaClientePorId(id: ID!): MembresiaCliente
+        obtenerMembresiasCliente: [MembresiaCliente]
         obtenerPago(id: ID!): Pago
         verificarSesion: Sesion!
         obtenerProductos: [Producto]!
+        obtenerVideos: [Video]!
+        obtenerVideo(idVideo: ID!): Video
+        obtenerMembresiaClienteID(id: ID!): MembresiaCliente
     }
 
     type Mutation {
         crearCliente(input: ClienteInput!): ID
         confirmarCuenta(token: String): ConfirmResponse
-        crearCurso(nombre: String!, descripcion: String!, url: String!): Curso
+        crearCurso(nombre: String!, descripcion: String!, idVideo: ID!): Curso
         crearMembresia(tipo: String!, precio: Float!): Membresia!
         crearPago(clienteId: ID!, fecha: String!, monto: Float!): Pago!
         crearMembresiaCliente(cliente: ID!, membresia: ID!, pago: ID!, fechaInicio: String!): MembresiaCliente!
@@ -117,6 +130,8 @@ const typeDefs = gql`
         reset(email: String): String
         cambioPass(token: String, password: String): ConfirmResponse
         crearProducto(nombre: String!, descripcion: String!, precio: Float!, imagen: String): Producto!
+        crearVideo(titulo: String!, descripcion: String!, duracion: Float!, idVideo: String!, url: String!): Video!
+        agregarCursoAMembresia(membresiaId: ID!, cursoId: ID!): Membresia!
     }
 
 
