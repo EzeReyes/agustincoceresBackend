@@ -300,13 +300,17 @@ const resolvers = {
         },
         logout: (_, __, { res }) => {
         res.setHeader('Set-Cookie', cookie.serialize('authToken', '', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            // secure: true,
-            maxAge: 0,
-            sameSite: 'lax',
-            // sameSite: 'none',
-            path: '/'
+              httpOnly: true,
+                secure: true,         // requiere HTTPS
+                maxAge: 1800,
+                sameSite: 'lax',      // si frontend y backend están en el mismo dominio
+                path: '/'
+                // sino
+                // httpOnly: true,
+                // secure: false,        // en local, sin HTTPS
+                // maxAge: 1800,
+                // sameSite: 'none',     // permite cross-site
+                // path: '/'
         }));
 
         return 'Sesión cerrada';
