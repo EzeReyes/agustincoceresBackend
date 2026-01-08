@@ -125,7 +125,7 @@ const resolvers = {
         },
         obtenerVideo: async (_, {idVideo}) => {
             const video = await Video.findOne({idVideo});
-            console.log(video);
+            console.log(video)
             return video;
         },
         obtenerMembresiaClienteID: async(_, {id}) => {
@@ -284,13 +284,14 @@ const resolvers = {
             const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '20m' });
             
             res.setHeader('Set-Cookie', cookie.serialize('authToken', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // true solo en prod
-                maxAge: 1800,
-                sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
-                path: '/'
-                }));
-
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            // secure: true,
+            maxAge: 1800,
+            sameSite: 'Lax',
+            // sameSite: 'none',
+            path: '/'
+        }));
 
         return {
         mensaje: 'Sesión iniciada',
@@ -298,14 +299,15 @@ const resolvers = {
         };
         },
         logout: (_, __, { res }) => {
-        res.setHeader('Set-Cookie', cookie.serialize('authToken', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // true solo en prod
-        maxAge: 1800,
-        sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
-        path: '/'
+        res.setHeader('Set-Cookie', cookie.serialize('authToken', '', {
+            httpOnly: true,
+            // secure: process.env.NODE_ENV === 'production',
+            secure: true,
+            maxAge: 0,
+            // sameSite: 'lax',
+            sameSite: 'none',
+            path: '/'
         }));
-
 
         return 'Sesión cerrada';
         },
