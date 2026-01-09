@@ -90,6 +90,7 @@ app.get('/ver', async (req, res) => {
         
         <!-- Título principal -->
         <header class="w-full max-w-5xl text-center mb-12">
+        <a href="${process.env.FRONTEND_URL}/dashboard" class="text-gray-400 hover:text-white mb-6 inline-block">&#8592; Volver al Dashboard</a>
           <div class="flex flex-col mb-6">
             <h1 class="text-4xl md:text-5xl font-bold mb-4">
               ${nombreCurso}

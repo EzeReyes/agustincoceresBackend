@@ -45,10 +45,10 @@ const resolvers = {
             const cursos = await Curso.find();
             return cursos;
         },
-        obtenerMembresia: async (_, { tipo }) => {
-            const membresia = await Membresia.findOne({ tipo });
-            return membresia;
-        },
+        // obtenerMembresia: async (_, { tipo }) => {
+        //     const membresia = await Membresia.findOne({ tipo });
+        //     return membresia;
+        // },
         obtenerCursosCliente: async (_, { clienteId }) => {
             const cliente = await Cliente.findById(clienteId).populate('cursos');
             return cliente.cursos;
@@ -131,7 +131,7 @@ const resolvers = {
         obtenerMembresiaClienteID: async(_, {id}) => {
             const membresiaCliente = await MembresiaCliente.findById(id).populate('cliente').populate('membresia').populate('pago');
             return membresiaCliente;
-        }
+        },
     },
     Mutation: {
         crearCliente: async (_, { input }) => {
@@ -284,13 +284,13 @@ const resolvers = {
                         const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '20m' });
             
                         res.setHeader('Set-Cookie', cookie.serialize('authToken', token, {
-                        httpOnly: true, // mantenelo activado para seguridad
-                          secure: true, // true solo en prod con HTTPS
+                            httpOnly: true, // mantenelo activado para seguridad
+                            secure: true, // true solo en prod con HTTPS
                             // secure: false,
-                        maxAge: 1800,
-                          sameSite: 'none',
-                        // sameSite: 'lax',
-                        path: '/'
+                            maxAge: 1800,
+                            sameSite: 'none',
+                            // sameSite: 'lax',
+                            path: '/'
                         }));
 
                         return {

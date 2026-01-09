@@ -27,6 +27,7 @@ const typeDefs = gql`
         nombre: String!
         precio: String!
         cursos: [Curso]
+        descripcion: String!
     }
 
     type Pago {
@@ -73,6 +74,7 @@ const typeDefs = gql`
     input MembresiaInput {
         tipo: String!
         precio: String!
+        descripcion: String!
     }
 
     type LoginResponse {
@@ -96,7 +98,6 @@ const typeDefs = gql`
         obtenerClientes: [Cliente]
         obtenerMembresias: [Membresia]
         obtenerCursos: [Curso]
-        obtenerMembresia(tipo: String!): Membresia
         obtenerCursosCliente(clienteId: ID!): [Curso]
         obtenerCliente(id: ID!): Cliente
         obtenerMembresiaCliente(cliente: ID!): MembresiaCliente
@@ -117,7 +118,7 @@ const typeDefs = gql`
         crearCliente(input: ClienteInput!): ID
         confirmarCuenta(token: String): ConfirmResponse
         crearCurso(nombre: String!, descripcion: String!, idVideo: ID!, info: String!, parrafo: String!): Curso
-        crearMembresia(tipo: String!, precio: Float!): Membresia!
+        crearMembresia(input: MembresiaInput!): Membresia!
         crearPago(clienteId: ID!, fecha: String!, monto: Float!): Pago!
         crearMembresiaCliente(cliente: ID!, membresia: ID!, pago: ID!, fechaInicio: String!): MembresiaCliente!
         agregarCursoACliente(clienteId: ID!, cursoId: ID!): Cliente!

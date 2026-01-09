@@ -6,7 +6,8 @@ const MembresiaSchema = mongoose.Schema({
     default: 'Membresia Standard'
     },
     precio: { type: Number, required: true },
-    cursos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Curso' }]
+    cursos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Curso' }],
+    descripcion: { type: String, required: true }
 });
 
 const Membresia = mongoose.model('Membresia', MembresiaSchema);
