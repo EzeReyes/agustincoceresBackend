@@ -11,6 +11,16 @@ const CursoSchema = mongoose.Schema({
         required: true,
         trim: true
     },
+    info: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    parrafo: {
+        type: String,
+        required: true,
+        trim: true
+    },
     idVideo: {
         type: Schema.Types.ObjectId,
         ref: 'Video',

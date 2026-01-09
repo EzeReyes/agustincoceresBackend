@@ -281,21 +281,23 @@ const resolvers = {
                             throw new Error('Credenciales incorrectas');
                         }
 
-            const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '20m' });
+                        const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '20m' });
             
-  res.setHeader('Set-Cookie', cookie.serialize('authToken', token, {
-  httpOnly: true, // mantenelo activado para seguridad
-  secure: true, // true solo en prod con HTTPS
-  maxAge: 1800,
-  sameSite: 'none',
-  path: '/'
-}));
+                        res.setHeader('Set-Cookie', cookie.serialize('authToken', token, {
+                        httpOnly: true, // mantenelo activado para seguridad
+                          secure: true, // true solo en prod con HTTPS
+                            // secure: false,
+                        maxAge: 1800,
+                          sameSite: 'none',
+                        // sameSite: 'lax',
+                        path: '/'
+                        }));
 
-        return {
-        mensaje: 'Sesión iniciada',
-        token
-        };
-        },
+                        return {
+                        mensaje: 'Sesión iniciada',
+                        token
+                        };
+                        },
         logout: (_, __, { res }) => {
         res.setHeader('Set-Cookie', cookie.serialize('authToken', '', {
             httpOnly: true,

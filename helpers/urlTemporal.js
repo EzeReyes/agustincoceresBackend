@@ -33,6 +33,6 @@ export function validarToken(token) {
     return payload;
   } catch (err) {
     console.error("Error al validar el token:", err.message);
-    return null; // Token inválido o expirado 
+    return 'Tu token para ver el video a vencido'; // Token inválido o expirado 
   }
 }

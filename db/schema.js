@@ -40,6 +40,8 @@ const typeDefs = gql`
         id: ID!
         nombre: String!
         descripcion: String!
+        info: String!
+        parrafo: String!
         idVideo: Video!
         img: String
     }
@@ -71,12 +73,6 @@ const typeDefs = gql`
     input MembresiaInput {
         tipo: String!
         precio: String!
-    }
-
-    input CursoInput {
-        nombre: String!
-        descripcion: String!
-        idVideo: ID!
     }
 
     type LoginResponse {
@@ -120,7 +116,7 @@ const typeDefs = gql`
     type Mutation {
         crearCliente(input: ClienteInput!): ID
         confirmarCuenta(token: String): ConfirmResponse
-        crearCurso(nombre: String!, descripcion: String!, idVideo: ID!): Curso
+        crearCurso(nombre: String!, descripcion: String!, idVideo: ID!, info: String!, parrafo: String!): Curso
         crearMembresia(tipo: String!, precio: Float!): Membresia!
         crearPago(clienteId: ID!, fecha: String!, monto: Float!): Pago!
         crearMembresiaCliente(cliente: ID!, membresia: ID!, pago: ID!, fechaInicio: String!): MembresiaCliente!
