@@ -28,6 +28,7 @@ const typeDefs = gql`
         precio: String!
         cursos: [Curso]
         descripcion: String!
+        video: String!
     }
 
     type Pago {

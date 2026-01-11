@@ -7,7 +7,8 @@ const MembresiaSchema = mongoose.Schema({
     },
     precio: { type: Number, required: true },
     cursos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Curso' }],
-    descripcion: { type: String, required: true }
+    descripcion: { type: String, required: true },
+    video: { type: String },
 });
 
 const Membresia = mongoose.model('Membresia', MembresiaSchema);
