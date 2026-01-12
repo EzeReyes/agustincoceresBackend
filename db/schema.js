@@ -99,6 +99,7 @@ const typeDefs = gql`
         obtenerClientePorEmail(email: String!): Cliente
         obtenerClientes: [Cliente]
         obtenerMembresias: [Membresia]
+        obtenerMembresia(id: ID!): Membresia
         obtenerCursos: [Curso]
         obtenerCursosCliente(clienteId: ID!): [Curso]
         obtenerCliente(id: ID!): Cliente

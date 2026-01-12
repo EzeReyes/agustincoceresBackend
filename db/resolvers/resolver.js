@@ -41,6 +41,10 @@ const resolvers = {
             const membresias = await Membresia.find();
             return membresias;
         },
+        obtenerMembresia: async (_, { id }) => {
+            const membresia = await Membresia.findById(id);
+            return membresia;
+        },
         obtenerCursos: async () => {
             const cursos = await Curso.find();
             return cursos;
