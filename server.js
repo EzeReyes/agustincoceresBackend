@@ -54,7 +54,7 @@ app.post('/api/url-temporal/:videoId', (req, res) => {
   const descripcionCurso = req.body.descripcion || 'Sin descripción';
   const infoCurso = req.body.info || '';
   const parrafoCurso = req.body.parrafo || '';
-  const url = generarURLTemporal(videoId, userId, 600); // 10 min
+  const url = generarURLTemporal(videoId, userId, 1800); // 10 min
   res.json({ url, nombreCurso, descripcionCurso, infoCurso, parrafoCurso });
 });
 

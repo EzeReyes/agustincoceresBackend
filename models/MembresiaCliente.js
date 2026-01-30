@@ -12,12 +12,7 @@ const MembresiaClienteSchema = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Membresia',
         required: true
-    },
-    pago: {
-        type: Schema.Types.ObjectId,
-        ref: 'Pago',
-        required: true
-    },
+        },
     fechaInicio: {
         type: Date,
         default: Date.now

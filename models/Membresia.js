@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const MembresiaSchema = mongoose.Schema({
     nombre: {
     type: String,
-    default: 'Membresia Standard'
     },
     poster: { type: String },
     precio: { type: Number, required: true },

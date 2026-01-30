@@ -1,6 +1,5 @@
 import Cliente from '../../models/Cliente.js';
 import Membresia from '../../models/Membresia.js';
-import Pago from '../../models/Pago.js';
 import Curso from '../../models/Curso.js';
 import Video from '../../models/Video.js';
 import Producto from '../../models/Producto.js';
@@ -42,7 +41,7 @@ const resolvers = {
             return membresias;
         },
         obtenerMembresia: async (_, { id }) => {
-            const membresia = await Membresia.findById(id);
+            const membresia = await Membresia.findById(id).populate('cursos');
             return membresia;
         },
         obtenerCursos: async () => {
@@ -61,7 +60,7 @@ const resolvers = {
             const cliente = await Cliente.findById(id);
             return cliente;
         },
-       obtenerMembresiaCliente: async (_, { cliente }) => {
+        obtenerMembresiaCliente: async (_, { cliente }) => {
         try {
         console.log("🔥 resolver ejecutado");
         console.log("cliente:", cliente);
@@ -76,7 +75,7 @@ const resolvers = {
                 path: 'idVideo'
                 }
             }
-            }).populate('pago');
+            });
 
         console.log("resultado:", membresia);
 
@@ -87,12 +86,8 @@ const resolvers = {
     }
         },
         obtenerMembresiasCliente: async () => {
-            const membresiasCliente = await MembresiaCliente.find().populate('cliente').populate('membresia').populate('pago');
+            const membresiasCliente = await MembresiaCliente.find().populate('cliente').populate('membresia');
             return membresiasCliente;
-        },
-        obtenerPagosCliente: async (_, { clienteId }) => {
-            const pagos = await Pago.find({ cliente: clienteId });
-            return pagos;
         },
         obtenerCursosDisponibles: async () => {
             const cursos = await Curso.find();
@@ -107,33 +102,33 @@ const resolvers = {
             const curso = await Curso.findById(id);
             return curso;
         },
-        obtenerPago: async (_, {id}) => {
-            const pago = await Pago.findById(id);
-            return pago;
-        },
         obtenerProductos: async () => {
             const productos = await Producto.find();
             return productos;
         },
         obtenerCurso: async (_, { id }) => {
-            const curso = await Curso.findById(id);
+            try {
+            const curso = await Curso.findById(id).populate('idVideo');
             return curso;
+            } catch (error) {
+            throw new Error('Error al obtener el curso');
+            }
         },
         obtenerCursos: async () => {
-            const cursos = await Curso.find();
+            const cursos = await Curso.find().populate('idVideo');
             return cursos;
         },
         obtenerVideos: async () => {
             const videos = await Video.find();
             return videos;
         },
-        obtenerVideo: async (_, {idVideo}) => {
-            const video = await Video.findOne({idVideo});
+        obtenerVideo: async (_, {id}) => {
+            const video = await Video.findById(id);
             console.log(video)
             return video;
         },
         obtenerMembresiaClienteID: async(_, {id}) => {
-            const membresiaCliente = await MembresiaCliente.findById(id).populate('cliente').populate('membresia').populate('pago');
+            const membresiaCliente = await MembresiaCliente.findById(id).populate('cliente').populate('membresia');
             return membresiaCliente;
         },
     },
@@ -211,50 +206,113 @@ const resolvers = {
                 console.log(error);
             }
         },
-        crearMembresia: async (_, { nombre, precio }) => {
+        crearMembresia: async (_, { input }) => {
             try {
-                if (!tipo || !precio) {
+                const { nombre, precio, descripcion, cursos, video, poster } = input;
+                if (!nombre || !precio) {
                     throw new Error('Todos los campos son obligatorios');
                 }
-            const datos = await new Membresia({ tipo, precio });
+            const datos = await new Membresia({ nombre, precio, descripcion, cursos, video, poster });
             datos.save(); 
             return datos;
             } catch (error) {
                 console.log(error);
             }
         },
-        crearPago: async (_, { clienteId, fecha, monto }) => {
+        modificarBaseDeMembresia: async (_, {idMembresia, input}) => {
             try {
-                if (!clienteId || !fecha || !monto) {
-                    throw new Error('Todos los campos son obligatorios');
-                }
-            const datos = await new Pago({ cliente: clienteId, fecha, monto });
-            datos.save(); 
-            return datos;
+                const existeMembresia = await Membresia.findOneAndUpdate(
+                    { _id: idMembresia },
+                    { $set: input },
+                    { new: true }
+                );
+                return existeMembresia;
             } catch (error) {
-                console.log(error);
+                throw new Error(error);
             }
         },
-        crearMembresiaCliente: async (_, { cliente, membresia, pago, fechaInicio }) => {
+        modificarMediaMembresia: async (_, { idMembresia, input }) => {
+            try {
+                const membresiaActualizada = await Membresia.findByIdAndUpdate(
+                    idMembresia,
+                    { $set: input },
+                    { new: true }
+                );
+
+                if (!membresiaActualizada) {
+                    throw new Error('Membresía no encontrada');
+                }
+
+                return membresiaActualizada;
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        modificarCursosDeMembresia: async (_, { idMembresia, input }) => {
+            try {
+                const membresiaActualizada = await Membresia.findByIdAndUpdate(
+                    idMembresia,
+                    { $set: input },
+                    { new: true }
+                ).populate('cursos');
+
+                if (!membresiaActualizada) {
+                    throw new Error('La membresía no existe');
+                }
+
+                return membresiaActualizada;
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        adherirMembresiaACliente: async (_, { cliente, membresia }) => {
         try {
-            if (!cliente || !membresia || !pago || !fechaInicio) {
+            if (!cliente || !membresia ) {
             throw new Error('Todos los campos son obligatorios');
             }
 
+            const fechaInicio = Date.now();
+
             // Crear instancia
-            const datos = new MembresiaCliente({ cliente, membresia, pago, fechaInicio });
+            const datos = new MembresiaCliente({ cliente, membresia, fechaInicio });
 
             // Guardar en DB
             await datos.save();
 
             // Popular referencias
-            const datosPopulated = await datos.populate('cliente membresia pago');
+            const datosPopulated = await datos.populate('cliente membresia');
 
             return datosPopulated;
         } catch (error) {
             console.error(error);
             throw new Error('Error al crear la membresía del cliente');
         }
+        },
+        eliminarMembresiaDeCliente: async (_, {cliente, membresia}) => {
+            try {
+                const clienteEncontrado = await Cliente.findById(cliente);
+                if(!clienteEncontrado) throw new Error('Cliente no Encontrado!');
+                const membresiaEncontrada = await MembresiaCliente.findByIdAndDelete(membresia);
+                if(!membresiaEncontrada) throw new Error('Membresia Inexistente');
+                return "Membresia Eliminada";
+            } catch (error) {
+                throw new Error(error);
+            }
+        },
+        modificarMembresiaDeCliente: async (_, {cliente, membresiaNueva}) => {
+            try {
+                const membresiaCliente = await MembresiaCliente.findOneAndUpdate(
+                    { cliente },
+                    { 
+                        membresia: membresiaNueva,
+                        fechaInicio: new Date()
+                    },
+                    { new: true }
+                    );
+                return membresiaCliente;
+            } catch (error) {
+                throw new Error(error);
+            }  
         },
         agregarCursoACliente: async (_, { clienteId, cursoId }) => {
             try {
@@ -358,26 +416,26 @@ const resolvers = {
 
             await cliente.save();
 
-            return { success: true, message: 'Password modificado serás redirigido a login' };
+            return { estado: true, mensaje: 'Password modificado serás redirigido a login' };
         },
-        crearCurso: async (_, { nombre, descripcion, idVideo }) => {
+        crearCurso: async (_, { nombre, descripcion, idVideo, parrafo, info }) => {
             try {
-                if (!nombre || !descripcion || !idVideo) {
+                if (!nombre || !descripcion || !idVideo || !parrafo || !info) {
                     throw new Error('Todos los campos son obligatorios');
                 }
-            const datos = await new Curso({ nombre, descripcion, idVideo });
+            const datos = await new Curso({ nombre, descripcion, idVideo, parrafo, info }).populate('idVideo');
             datos.save(); 
             return datos;
             } catch (error) {
                 console.log(error);
             }
         },
-        crearVideo: async (_, { titulo, descripcion, duracion, url }) => {
+        crearVideo: async (_, { titulo, descripcion, duracion, idVideo }) => {
             try {
-                if (!titulo || !descripcion || !duracion || !url) {
+                if (!titulo || !descripcion || !duracion || !idVideo) {
                     throw new Error('Todos los campos son obligatorios');
                 }
-            const datos = await new Video({ titulo, descripcion, duracion, url });
+            const datos = await new Video({ titulo, descripcion, duracion, idVideo });
             datos.save(); 
             return datos;
             } catch (error) {
@@ -385,18 +443,97 @@ const resolvers = {
             }
         },
         agregarCursoAMembresia: async (_, { membresiaId, cursoId }) => {
+        try {
+            const membresia = await Membresia.findOneAndUpdate(
+            { 
+                _id: membresiaId,
+                cursos: { $ne: cursoId }
+            },
+            { 
+                $push: { cursos: cursoId }
+            },
+            { new: true }
+            );
+
+            if (!membresia) {
+            throw new Error('La membresía no existe o el curso ya está asignado');
+            }
+
+            return membresia;
+        } catch (error) {
+            throw new Error(error.message);
+        }
+        },
+        eliminarMembresia: async (_, {membresiaId}) => {
+            const membresiaExiste = await Membresia.findByIdAndDelete(membresiaId);
+            if(!membresiaExiste) {
+                throw new Error(error);
+            }
+            return "La membresia fue eliminada con exito!"
+        },
+        modificarCurso: async (_, {id, nombre, descripcion, idVideo, info, parrafo}) => {
             try {
-                const membresia = await Membresia.findById(membresiaId);
-                if (!membresia) {
-                    throw new Error('Membresia no encontrada');
+                const cursoActualizado = await Curso.findByIdAndUpdate(
+                    id,
+                    { 
+                        nombre,
+                        descripcion,
+                        idVideo,
+                        info,
+                        parrafo
+                    },
+                    { new: true }
+                ).populate('idVideo');
+                if (!cursoActualizado) {
+                    throw new Error('Curso no encontrado');
                 }
-                membresia.cursos.push(cursoId);
-                await membresia.save();
-                return membresia;
+                return cursoActualizado;
             } catch (error) {
-                console.log(error);
+                throw new Error(error.message);
             }
         },
+        eliminarCurso: async (_, { id }) => {
+            try {
+                const cursoEliminado = await Curso.findByIdAndDelete(id);
+                if (!cursoEliminado) {
+                    throw new Error('Curso no encontrado');
+                }
+                return 'Curso eliminado correctamente';
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        eliminarVideo: async (_, { id }) => {
+            try {
+                const videoEliminado = await Video.findByIdAndDelete(id);
+                if (!videoEliminado) {
+                    throw new Error('Video no encontrado');
+                }
+                return 'Video eliminado correctamente';
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        modificarVideo: async (_, { id, titulo, descripcion, duracion }) => {
+            try {
+                const videoActualizado = await Video.findByIdAndUpdate(
+                    id,
+                    { 
+                        titulo,
+                        descripcion,
+                        duracion
+                    },
+                    { new: true }
+                );
+                if (!videoActualizado) {
+                    throw new Error('Video no encontrado');
+                }
+                return videoActualizado;
+            }
+            catch (error) {
+                throw new Error(error.message);
+            }
+        }
     }
 };
 

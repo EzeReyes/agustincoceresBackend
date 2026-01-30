@@ -18,7 +18,6 @@ const typeDefs = gql`
         id: ID!
         cliente: Cliente!
         membresia: Membresia!
-        pago: Pago!
         fechaInicio: String!
     }
 
@@ -30,13 +29,6 @@ const typeDefs = gql`
         descripcion: String!
         video: String!
         poster: String!
-    }
-
-    type Pago {
-        id: ID!
-        cliente: Cliente!
-        fecha: String!
-        monto: Float!
     }
 
     type Curso {
@@ -74,9 +66,27 @@ const typeDefs = gql`
     }
 
     input MembresiaInput {
-        tipo: String!
+        nombre: String!
+        precio: String!
+        cursos: [ID!]!
+        descripcion: String!
+        video: String!
+        poster: String!
+    }
+
+    input MembresiaBaseInput {
+        nombre: String!
         precio: String!
         descripcion: String!
+    }
+
+    input MediaMembresiaInput {
+        video: String!
+        poster: String!
+    }
+
+    input CursosMembresiaInput {
+        cursos: [ID!]!
     }
 
     type LoginResponse {
@@ -104,16 +114,14 @@ const typeDefs = gql`
         obtenerCursosCliente(clienteId: ID!): [Curso]
         obtenerCliente(id: ID!): Cliente
         obtenerMembresiaCliente(cliente: ID!): MembresiaCliente
-        obtenerPagosCliente(clienteId: ID!): [Pago]
         obtenerCursosDisponibles: [Curso]
         obtenerCursosNoInscritos(clienteId: ID!): [Curso]
         obtenerCurso(id: ID!): Curso
         obtenerMembresiasCliente: [MembresiaCliente]
-        obtenerPago(id: ID!): Pago
         verificarSesion: Sesion!
         obtenerProductos: [Producto]!
         obtenerVideos: [Video]!
-        obtenerVideo(idVideo: ID!): Video
+        obtenerVideo(id: ID!): Video!
         obtenerMembresiaClienteID(id: ID!): MembresiaCliente
     }
 
@@ -121,17 +129,26 @@ const typeDefs = gql`
         crearCliente(input: ClienteInput!): ID
         confirmarCuenta(token: String): ConfirmResponse
         crearCurso(nombre: String!, descripcion: String!, idVideo: ID!, info: String!, parrafo: String!): Curso
+        modificarCurso(id: ID!, nombre: String!, descripcion: String!, idVideo: ID!, info: String!, parrafo: String!): Curso!
+        eliminarCurso(id: ID!): String!
         crearMembresia(input: MembresiaInput!): Membresia!
-        crearPago(clienteId: ID!, fecha: String!, monto: Float!): Pago!
-        crearMembresiaCliente(cliente: ID!, membresia: ID!, pago: ID!, fechaInicio: String!): MembresiaCliente!
+        modificarBaseDeMembresia(idMembresia: ID!, input: MembresiaBaseInput!): Membresia!
+        modificarMediaMembresia(idMembresia: ID!, input: MediaMembresiaInput!): Membresia!
+        modificarCursosDeMembresia(idMembresia: ID!, input: CursosMembresiaInput!): Membresia!
+        adherirMembresiaACliente(cliente: ID!, membresia: ID!): MembresiaCliente!
+        eliminarMembresiaDeCliente(cliente: ID!, membresia: ID!): String!
+        modificarMembresiaDeCliente(cliente: ID!, membresiaNueva: ID!): MembresiaCliente!
         agregarCursoACliente(clienteId: ID!, cursoId: ID!): Cliente!
         login(email: String!, password: String!): LoginResponse
         logout: String
         reset(email: String): String
         cambioPass(token: String, password: String): ConfirmResponse
         crearProducto(nombre: String!, descripcion: String!, precio: Float!, imagen: String): Producto!
-        crearVideo(titulo: String!, descripcion: String!, duracion: Float!, idVideo: String!, url: String!): Video!
+        crearVideo(titulo: String!, descripcion: String!, duracion: Float!, idVideo: String!): Video!
         agregarCursoAMembresia(membresiaId: ID!, cursoId: ID!): Membresia!
+        eliminarMembresia(membresiaId: ID!): String!
+        eliminarVideo(id: ID!): String!
+        modificarVideo(id: ID!, titulo: String!, descripcion: String!, duracion: Float!): Video!
     }
 
 

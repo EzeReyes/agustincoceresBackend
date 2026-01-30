@@ -29,7 +29,7 @@ const clienteSchema = mongoose.Schema({
     },
     membresiaActiva: {
         type: Schema.Types.ObjectId,
-        ref: 'MembresiaCliente',
+        ref: 'MembresiaCliente'
     },
     confirmado: {
         type: Boolean,
